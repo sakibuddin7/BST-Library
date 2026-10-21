@@ -3,8 +3,13 @@ using namespace std;
 
 struct Node {
     int key;
-    Node* left;
-    Node* right;
+    Node* lchild;
+    Node* rchild;
+
+    Node (int k){
+        key = k;
+        lchild = rchild = nullptr;
+    }
 };
 
 Node* search(Node* root, int target) {
