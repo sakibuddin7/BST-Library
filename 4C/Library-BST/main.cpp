@@ -12,7 +12,7 @@ Node* search(Node* root, int target) {
 
     while (current != nullptr) {
         if (current->key == target) {
-            return current; // Nodo trovato 
+            return current; 
         }
         
         if (target < current->key) {
