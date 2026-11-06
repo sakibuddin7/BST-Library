@@ -85,7 +85,111 @@ private:
 
     // Qui puoi aggiungere funzioni di appoggio private (per esempio quelle ricorsive,
     // che hanno bisogno di ricevere un nodo come argomento).
+    bool searchHelper (Node* root, const int key){
+        Node* current = root;
 
+        while(current != nullptr){
+            if (key == current->getData()){
+                return true;
+            }
+
+            if (key < current->getData()){
+                current = current->getLeft();
+            }
+
+            if (key > current->getData()){
+                current = current->getRight();
+            }
+        }
+
+        return false;
+    }
+
+    void orderHelper (Node* nodo){
+        if (nodo == nullptr){
+            return;
+        }
+
+        orderHelper (nodo->getLeft());
+        cout << nodo->getData() << " ";
+        orderHelper (nodo->getRight());
+    }
+
+    int heightHelper (Node* nodo){
+        if (nodo == nullptr){
+            return 0;
+        }
+
+        int Lheight = heightHelper (nodo->getLeft());
+        int Rheight = heightHelper (nodo->getRight());
+
+        if (Lheight < Rheight){
+            return Rheight + 1;
+
+        } else {
+            return Lheight + 1;
+
+        }
+    }
+
+    int minimoHelper (Node* nodo){
+        if (nodo == nullptr){
+            return -1;
+        }
+
+        if (nodo->getLeft() == nullptr){
+            return nodo->getData();
+        }
+
+        return minimoHelper (nodo->getLeft());
+    }
+
+    int massimoHelper (Node* nodo){
+        if (nodo == nullptr){
+            return -1;
+        }
+
+        if (nodo->getRight() == nullptr){
+            return nodo->getData();
+        }
+
+        return massimoHelper (nodo->getRight());
+    }
+
+    int contaIntervalloHelper (Node* nodo, int max, int min){
+        if (nodo == nullptr){
+            return 0;
+        }
+
+        int conta = 0; 
+
+        if (nodo->getData() >= min && nodo->getData() <= max){
+            conta = 1;
+        }
+        if (nodo->getData() < min){
+            conta = conta + contaIntervalloHelper (nodo->getRight(), max, min);
+
+        }
+
+        if (nodo->getData() > max){
+            conta = conta + contaIntervalloHelper (nodo->getLeft(), max, min);
+        }
+
+        return conta;
+
+    }
+
+    int contaFoglieHelper (Node* nodo){
+        if (nodo == nullptr){
+            return 0;
+        }
+
+        if (nodo->isLeaf() == true){
+            return 1;
+        }
+
+        return contaFoglieHelper(nodo->getLeft()) + contaFoglieHelper(nodo->getRight());
+    }
 public:
     // TODO 5 - costruttore BST, isEmpty, size
     //          Il costruttore crea un albero vuoto. isEmpty dice se l'albero e' vuoto,
@@ -96,7 +200,7 @@ public:
     }
 
     bool isEmpty(){
-        if (root = nullptr){
+        if (root == nullptr){
             return true;
         }
 
@@ -126,8 +230,7 @@ public:
             }
 
             if (key < current->getData()){
-                current = current->getLeft();
-                if (current == nullptr){
+                if (current->getLeft() == nullptr){
                     current->setLeft(new Node(key));
                     numNodi++;
                     return true;
@@ -135,97 +238,49 @@ public:
             }
 
             if (key > current->getData()){
-                current = current->getRight();
-                if (current == nullptr){
+                if (current->getRight() == nullptr){
                     current->setRight(new Node(key));
                     numNodi++;
                     return true;
                 }
             }
         }
+
+        return false;
     }
+
 
     // TODO 7 - search
     //          Dice se una chiave e' presente nell'albero (non modifica l'albero).
-    bool search (Node* root, const int key){
-        Node* current = root;
-
-        while(current != nullptr){
-            if (key == current->getData()){
-                return true;
-            }
-
-            if (key < current->getData()){
-                current = current->getLeft();
-            }
-
-            if (key > current->getData()){
-                current = current->getRight();
-            }
-        }
-
-        return false;
+    bool search (int key){
+        return searchHelper(root, key);
     }
 
     // TODO 8 - inOrder
     //          Stampa su cout tutte le chiavi in ordine crescente (visita inorder),
     //          ciascuna seguita da uno spazio. Se l'albero e' vuoto non stampa nulla.
     //          Non va a capo: ci pensa il main.
-    void inOrder (Node* nodo){
-        if (nodo == nullptr){
-            return;
-        }
-
-        inOrder (nodo->getLeft());
-        cout << nodo->getData() << " ";
-        inOrder (nodo->getRight());
+    void inOrder (){
+        orderHelper(root);
     }
 
     // TODO 9 - height
     //          Restituisce l'altezza dell'albero, cioe' il numero di nodi del cammino piu' lungo
     //          dalla radice a una foglia. Albero vuoto: 0.
-    int height (Node* nodo){
-        if (nodo == nullptr){
-            return 0;
-        }
-
-        int Lheight = height (nodo->getLeft());
-        int Rheight = height (nodo->getRight());
-
-        if (Lheight < Rheight){
-            return Rheight + 1;
-
-        } else {
-            return Lheight + 1;
-
-        }
+    int height (){
+        return heightHelper(root);
     }
 
     // TODO 10 - minimo, massimo
     //          Restituiscono la chiave piu' piccola e quella piu' grande.
     //          Per un albero vuoto restituiscono -1 (nell'esercizio le chiavi sono sempre positive).
-    int minimo(Node* nodo){
-        if (nodo == nullptr){
-            return -1;
-        }
+    int minimo(){
+        return minimoHelper (root);
 
-        if (nodo->getLeft() == nullptr){
-            return nodo->getData();
-        }
-
-        return minimo (nodo->getLeft());
     }
 
-    int massimo (Node* nodo){
-        if (nodo == nullptr){
-            return -1;
-        }
-
-        if (nodo->getRight() == nullptr){
-            return nodo->getData();
-        }
-
-        return massimo (nodo->getRight());
+    int massimo (){
+        return massimoHelper (root);
     }
 
     // =================================================================
@@ -251,35 +306,16 @@ public:
 
     // TODO 13 - contaFoglie
     //          Restituisce quante foglie ha l'albero (usa isLeaf). Albero vuoto: 0.
-    int contaFoglie (Node* nodo){
-        if (nodo == nullptr){
-            return 0;
-        }
-
-        if (nodo->isLeaf() == true){
-            return 1;
-        }
-
-        return contaFoglie(nodo->getLeft()) + contaFoglie(nodo->getRight());
+    int contaFoglie (){
+        return contaFoglieHelper (root);
     }
+
     // BONUS TODO 14 - contaIntervallo
     //          Riceve due chiavi low e high e restituisce quante chiavi dell'albero sono comprese
     //          tra low e high (estremi inclusi). Sfrutta la proprieta' del BST: non serve
     //          visitare i sottoalberi che non possono contenere chiavi dell'intervallo.
-    int contaIntervallo(Node* nodo, int max, int min){
-        if (nodo == nullptr){
-            return 0;
-        }
-
-        if (nodo->getData() < min){
-            nodo = nodo->getRight();
-        }
-
-        if (nodo->getData() > max){
-            nodo = nodo->getLeft();
-        }
-
-        return 1 + contaIntervallo(nodo, max, min);
+    int contaIntervallo(int max, int min){
+        return contaIntervalloHelper (root, max, min);
 
     }
 };
